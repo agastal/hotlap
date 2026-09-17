@@ -135,7 +135,7 @@ ul{{list-style:none;font-size:16px;opacity:.8;line-height:1.7;width:90%;margin:0
 </head>
 <body>
 <div class="logo-wrap"><img class="logo" src="assets/ops.png" alt="Logo"></div>
-<h1>Hotlap Position — {driver_name}</h1>
+<h1>Hotlap Position</h1>
 <div class="updated">Aggiornato: {updated}</div>
 <div class="table-wrap">
 <table>
