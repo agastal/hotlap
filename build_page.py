@@ -115,13 +115,13 @@ body{{font-family:system-ui,sans-serif;background:#18181b;color:#fff;padding:1.5
 h1{{font-size:32px;margin-bottom:.25rem;text-align:center}}
 .updated{{opacity:.5;font-size:15px;margin-bottom:1.5rem;text-align:center}}
 table{{width:90%;margin:0 auto 2rem;border-collapse:collapse}}
-thead tr{{background:#c0392b;text-align:left}}
-th{{padding:.6rem .9rem;font-size:15px;text-transform:uppercase;opacity:.8}}
-td{{padding:.6rem .9rem;font-family:monospace;font-size:18px}}
+thead tr{{background:#c0392b;text-align:center}}
+th{{padding:.6rem .9rem;font-size:15px;text-transform:uppercase;opacity:.8;text-align:center}}
+td{{padding:.6rem .9rem;font-family:monospace;font-size:18px;text-align:center}}
 tbody tr{{border-bottom:1px solid #333}}
 tr.me{{background:#2a2a2e;font-weight:700}}
 h2{{font-size:20px;opacity:.7;margin-bottom:.5rem;text-align:center}}
-ul{{list-style:none;font-size:16px;opacity:.8;line-height:1.7;width:90%;margin:0 auto}}
+ul{{list-style:none;font-size:16px;opacity:.8;line-height:1.7;width:90%;margin:0 auto;text-align:center}}
 </style>
 </head>
 <body>
