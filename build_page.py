@@ -108,32 +108,43 @@ def render_html(entries: list, driver_pos: int | None, driver_name: str, state: 
 <meta http-equiv="refresh" content="120">
 <title>Hotlap — {driver_name}</title>
 <style>
+html,body{{overflow-x:hidden}}
 *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
-body{{font-family:system-ui,sans-serif;background:#18181b;color:#fff;padding:1.5rem;font-size:20px;max-width:900px;margin:0 auto}}
+body{{font-family:system-ui,sans-serif;background:#18181b;color:#fff;padding:1.5rem;font-size:20px;max-width:900px;margin:0 auto;text-align:center}}
 .logo-wrap{{display:flex;align-items:center;justify-content:center;margin-bottom:1rem}}
-.logo{{max-height:220px;width:auto}}
-h1{{font-size:32px;margin-bottom:.25rem;text-align:center}}
-.updated{{opacity:.5;font-size:15px;margin-bottom:1.5rem;text-align:center}}
-table{{width:90%;margin:0 auto 2rem;border-collapse:collapse}}
+.logo{{max-height:220px;max-width:100%;width:auto}}
+h1{{font-size:32px;margin-bottom:.25rem}}
+.updated{{opacity:.5;font-size:15px;margin-bottom:1.5rem}}
+.table-wrap{{width:90%;margin:0 auto 2rem;overflow-x:auto}}
+table{{width:100%;margin:0 auto;border-collapse:collapse}}
 thead tr{{background:#c0392b;text-align:center}}
-th{{padding:.6rem .9rem;font-size:15px;text-transform:uppercase;opacity:.8;text-align:center}}
-td{{padding:.6rem .9rem;font-family:monospace;font-size:18px;text-align:center}}
+th{{padding:.6rem .9rem;font-size:15px;text-transform:uppercase;opacity:.8;text-align:center;white-space:nowrap}}
+td{{padding:.6rem .9rem;font-family:monospace;font-size:18px;text-align:center;white-space:nowrap}}
 tbody tr{{border-bottom:1px solid #333}}
 tr.me{{background:#2a2a2e;font-weight:700}}
-h2{{font-size:20px;opacity:.7;margin-bottom:.5rem;text-align:center}}
-ul{{list-style:none;font-size:16px;opacity:.8;line-height:1.7;width:90%;margin:0 auto;text-align:center}}
+h2{{font-size:20px;opacity:.7;margin-bottom:.5rem}}
+ul{{list-style:none;font-size:16px;opacity:.8;line-height:1.7;width:90%;margin:0 auto}}
+@media (max-width:480px){{
+  body{{padding:1rem;font-size:16px}}
+  h1{{font-size:22px}}
+  .logo{{max-height:140px}}
+  td,th{{padding:.4rem .5rem;font-size:14px}}
+  ul{{font-size:13px}}
+}}
 </style>
 </head>
 <body>
 <div class="logo-wrap"><img class="logo" src="assets/ops.png" alt="Logo"></div>
 <h1>Hotlap Position — {driver_name}</h1>
 <div class="updated">Aggiornato: {updated}</div>
+<div class="table-wrap">
 <table>
 <thead><tr><th>#</th><th>Driver</th><th>Best Lap</th><th>Gap</th></tr></thead>
 <tbody>
 {rows_html}
 </tbody>
 </table>
+</div>
 <h2>Storico cambi</h2>
 <ul>
 {history_html}
