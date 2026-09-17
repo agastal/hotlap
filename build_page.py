@@ -172,7 +172,7 @@ def main():
     html = render_html(
         entries,
         driver["Position"] if driver else None,
-        driver["FullName"] if driver else NAME,
+        clean_name(driver["FullName"]) if driver else NAME,
         state,
         now,
     )
