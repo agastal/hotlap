@@ -7,7 +7,7 @@ import re
 import urllib.request
 from datetime import datetime, timezone
 
-URL = "https://fr4.assettohosting.com:50161/leaderboards/embed/ac5dd7f9-5f8d-438b-a49d-ab1a8c41de49"
+URL = "https://fr4.assettohosting.com:50161/leaderboards/embed/21a6ad87-8c99-4f54-a6e1-b601669c05ea"
 NAME = "Adriano Gastaldello"
 STATE_FILE = "state.json"
 OUT_FILE = "docs/index.html"
