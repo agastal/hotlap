@@ -121,8 +121,15 @@ def render_html(entries: list, driver_pos: int | None, driver_name: str, state: 
         for pos, name, time_, gap in entries
     )
 
+    history = state["history"]
+    event_start = max(
+        (i for i, h in enumerate(history) if h["text"].startswith("nuovo evento")),
+        default=0,
+    )
+    current_week_history = history[event_start:]
+
     history_html = "".join(
-        f"<li>{h['when']} — {h['text']}</li>\n" for h in reversed(state["history"][-30:])
+        f"<li>{h['when']} — {h['text']}</li>\n" for h in reversed(current_week_history)
     )
 
     return f"""<!DOCTYPE html>
@@ -174,7 +181,7 @@ ul{{list-style:none;font-size:16px;opacity:.8;line-height:1.7;width:90%;margin:0
 </tbody>
 </table>
 </div>
-<h2>Storico cambi</h2>
+<h2>Storico cambi (settimana corrente)</h2>
 <ul>
 {history_html}
 </ul>
