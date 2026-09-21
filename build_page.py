@@ -4,14 +4,24 @@
 import json
 import os
 import re
+import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 
-URL = "https://fr4.assettohosting.com:50161/leaderboards/embed/21a6ad87-8c99-4f54-a6e1-b601669c05ea"
-NAME = "Adriano Gastaldello"
+DEFAULT_URL = "https://fr4.assettohosting.com:50161/leaderboards/embed/21a6ad87-8c99-4f54-a6e1-b601669c05ea"
+DEFAULT_NAME = "Adriano Gastaldello"
+CONFIG_FILE = "config.json"
 STATE_FILE = "state.json"
 OUT_FILE = "docs/index.html"
 MAX_HISTORY = 100
+
+
+def load_config() -> dict:
+    if os.path.exists(CONFIG_FILE):
+        with open(CONFIG_FILE) as f:
+            cfg = json.load(f)
+        return {"url": cfg.get("url", DEFAULT_URL), "name": cfg.get("name", DEFAULT_NAME)}
+    return {"url": DEFAULT_URL, "name": DEFAULT_NAME}
 
 
 def rows_url(u: str) -> str:
@@ -22,6 +32,14 @@ def fetch_rows(u: str) -> list:
     req = urllib.request.Request(rows_url(u), headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req, timeout=15) as resp:
         return json.load(resp)
+
+
+def fetch_track(u: str) -> str | None:
+    req = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=15) as resp:
+        html = resp.read().decode("utf-8", errors="replace")
+    m = re.search(r'<p class="track">(.*?)</p>', html, re.DOTALL)
+    return m.group(1).strip() if m else None
 
 
 def clean_name(name: str) -> str:
@@ -80,8 +98,15 @@ def table_rows(rows: list, position: int, max_steps: int = 3) -> list[tuple]:
 def load_state() -> dict:
     if os.path.exists(STATE_FILE):
         with open(STATE_FILE) as f:
-            return json.load(f)
-    return {"position": None, "best_lap": None, "history": []}
+            state = json.load(f)
+    else:
+        state = {}
+    state.setdefault("position", None)
+    state.setdefault("best_lap", None)
+    state.setdefault("car", None)
+    state.setdefault("track", None)
+    state.setdefault("history", [])
+    return state
 
 
 def save_state(state: dict) -> None:
@@ -89,7 +114,7 @@ def save_state(state: dict) -> None:
         json.dump(state, f, indent=2, ensure_ascii=False)
 
 
-def render_html(entries: list, driver_pos: int | None, driver_name: str, state: dict, updated: str) -> str:
+def render_html(entries: list, driver_pos: int | None, driver_name: str, state: dict, updated: str, stale: bool = False) -> str:
     rows_html = "".join(
         f'<tr class="{"me" if pos == driver_pos else ""}">'
         f"<td>#{pos:02d}</td><td>{name}</td><td>{time_}</td><td>{gap}</td></tr>\n"
@@ -124,6 +149,8 @@ tbody tr{{border-bottom:1px solid #333}}
 tr.me{{background:#2a2a2e;font-weight:700}}
 h2{{font-size:20px;opacity:.7;margin-bottom:.5rem}}
 ul{{list-style:none;font-size:16px;opacity:.8;line-height:1.7;width:90%;margin:0 auto}}
+.event{{opacity:.7;font-size:16px;margin-bottom:.25rem}}
+.stale{{color:#f39c12;font-size:14px;margin-bottom:1rem}}
 @media (max-width:480px){{
   body{{padding:1rem;font-size:16px}}
   h1{{font-size:22px}}
@@ -136,7 +163,9 @@ ul{{list-style:none;font-size:16px;opacity:.8;line-height:1.7;width:90%;margin:0
 <body>
 <div class="logo-wrap"><img class="logo" src="assets/ops.png" alt="Logo"></div>
 <h1>Hotlap Position</h1>
+<div class="event">{state.get('car') or '?'} — {state.get('track') or '?'}</div>
 <div class="updated">Aggiornato: {updated}</div>
+{'<div class="stale">Evento non raggiungibile, mostro ultimo dato disponibile</div>' if stale else ''}
 <div class="table-wrap">
 <table>
 <thead><tr><th>#</th><th>Driver</th><th>Best Lap</th><th>Gap</th></tr></thead>
@@ -155,10 +184,33 @@ ul{{list-style:none;font-size:16px;opacity:.8;line-height:1.7;width:90%;margin:0
 
 
 def main():
-    rows = fetch_rows(URL)
-    driver = find_driver(rows, NAME)
+    config = load_config()
+    url = config["url"]
+    name = config["name"]
     state = load_state()
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+    try:
+        rows = fetch_rows(url)
+        track = fetch_track(url)
+    except (urllib.error.URLError, json.JSONDecodeError, TimeoutError) as exc:
+        print(f"Evento non raggiungibile ({exc}), mantengo ultimo dato disponibile")
+        if not os.path.exists(OUT_FILE):
+            os.makedirs(os.path.dirname(OUT_FILE), exist_ok=True)
+            html = render_html([], None, name, state, now, stale=True)
+            with open(OUT_FILE, "w", encoding="utf-8") as f:
+                f.write(html)
+        return
+
+    driver = find_driver(rows, name)
+    car = driver["CarName"] if driver else (rows[0]["CarName"] if rows else None)
+
+    if car and track and (car, track) != (state.get("car"), state.get("track")):
+        state["history"].append({"when": now, "text": f"nuovo evento: {car} — {track}"})
+        state["car"] = car
+        state["track"] = track
+        state["position"] = None
+        state["best_lap"] = None
 
     entries = []
     if driver is not None:
@@ -186,7 +238,7 @@ def main():
     html = render_html(
         entries,
         driver["Position"] if driver else None,
-        clean_name(driver["FullName"]) if driver else NAME,
+        clean_name(driver["FullName"]) if driver else name,
         state,
         now,
     )
