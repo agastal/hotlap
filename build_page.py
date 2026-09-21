@@ -181,7 +181,7 @@ ul{{list-style:none;font-size:16px;opacity:.8;line-height:1.7;width:90%;margin:0
 </tbody>
 </table>
 </div>
-<h2>Storico cambi (settimana corrente)</h2>
+<h2>Cambi</h2>
 <ul>
 {history_html}
 </ul>
