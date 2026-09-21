@@ -1,5 +1,5 @@
 {
-  "position": 3,
+  "position": 4,
   "best_lap": "2:23.955",
   "history": [
     {
@@ -33,6 +33,10 @@
     {
       "when": "2026-09-21 12:42:08 UTC",
       "text": "trovato: #3, best lap 2:23.955"
+    },
+    {
+      "when": "2026-09-21 16:35:57 UTC",
+      "text": "giu: #3 -> #4 (best lap 2:23.955)"
     }
   ],
   "car": "Ferrari 296 GT3",
