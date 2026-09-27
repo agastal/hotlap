@@ -1,5 +1,5 @@
 {
-  "position": 11,
+  "position": 12,
   "best_lap": "2:21.804",
   "history": [
     {
@@ -61,6 +61,10 @@
     {
       "when": "2026-09-24 10:17:00 UTC",
       "text": "giu: #10 -> #11 (best lap 2:21.804)"
+    },
+    {
+      "when": "2026-09-27 21:36:29 UTC",
+      "text": "giu: #11 -> #12 (best lap 2:21.804)"
     }
   ],
   "car": "Ferrari 296 GT3",
